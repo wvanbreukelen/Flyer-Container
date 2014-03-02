@@ -34,18 +34,8 @@ $container->bind('foo', function()
 	return new Foo();
 });
 
-$container->singleton('bar', function()
-{
-	return new Bar();
-});
+$bar = new Bar();
 
+$container->instance($bar);
 
-//print_r($container->make('foo'));
-
-$bar = $container->make('bar');
-
-$bar->set('haha');
-
-print_r($bar);
-
-print_r($container->make('bar'));
+print_r($container->make('foo'));

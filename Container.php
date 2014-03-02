@@ -40,8 +40,19 @@ class Container
 	
 	public function singleton($abstract, $closure)
 	{
-
 		$this->bind($abstract, $closure, array('singleton' => true));
+	}
+
+	/**
+	 * Bind a existing instance into the container
+	 */
+	
+	public function instance($instance)
+	{
+		if (is_object($instance))
+		{
+			$this->instances[strtolower(get_class($instance))] = $instance;
+		}
 	}
 
 	/**
