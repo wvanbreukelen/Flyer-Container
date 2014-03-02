@@ -18,9 +18,17 @@ class Bar
 
 class Foo
 {
-	public function __construct()
-	{
 
+	protected $bar;
+
+	public function __construct(Bar $bar)
+	{
+		$this->bar = $bar;
+	}
+
+	public function getBar()
+	{
+		return $this->bar;
 	}
 }
 
@@ -29,13 +37,11 @@ require('Container.php');
 
 $container = new Flyer\Components\Container();
 
+$container->instance(new Bar);
 $container->bind('foo', function()
 {
 	return new Foo();
 });
 
-$bar = new Bar();
+print_r($container->make('foo')->getBar());
 
-$container->instance($bar);
-
-print_r($container->make('foo'));

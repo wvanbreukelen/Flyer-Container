@@ -1,5 +1,8 @@
 <?php namespace Flyer\Components;
 
+use ReflectionClass;
+use ReflectionParameter;
+
 class Container
 {
 
@@ -20,6 +23,10 @@ class Container
 	 */
 	
 	protected $aliases = array();
+
+	/**
+	 * Contains all of the bindings options
+	 */
 
 	protected $options = array();
 
@@ -67,9 +74,32 @@ class Container
 			{
 				return $this->instances[$abstract];
 			}
-		 	return $this->instances[$abstract] = $this->bindings[$abstract](); 
+		 	//$concrete = $this->instances[$abstract] = $this->bindings[$abstract]();
+
+		 	return $this->build('Foo');
 		}
+
+
 		return false;
+	}
+
+	public function build($concrete)
+	{
+		$reflector = new ReflectionClass($concrete);
+		$constructor = $reflector->getConstructor();
+
+		if (is_null($constructor))
+		{
+			//echo 1;
+			return $concrete;
+		}
+
+		$dependencies = $constructor->getParameters();
+		
+		$instances = $this->getDependencies($dependencies);
+
+		return $reflector->newInstanceArgs($instances);
+
 	}
 
 	protected function isSingleton($abstract)
@@ -116,5 +146,39 @@ class Container
 	protected function resolveClassName($instance)
 	{
 		return get_class($instance);
+	}
+
+	protected function getDependencies($parameters)
+	{
+		$dependencies = array();
+		
+		foreach ($parameters as $parameter)
+		{
+			$dependency = $parameter->getClass();
+			if (!is_null($dependency))
+			{
+				$dependencies[] = $this->resolveClass($parameter);
+			}
+		}
+
+		//print_r($dependencies);
+
+		return (array) $dependencies;
+	}
+
+	/**
+	 * Resolve a class baed dependency from the container
+	 */
+
+	protected function resolveClass(ReflectionParameter $parameter)
+	{
+		try
+		{
+			//return $this->make($parameter->getClass()->name);
+			$name = $parameter->getClass()->name;
+			return new $name;
+		} catch (\Exception $e) {
+			throw "Error: " .  $e;
+		}
 	}
 }
