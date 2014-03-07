@@ -37,11 +37,5 @@ require('Container.php');
 
 $container = new Flyer\Components\Container();
 
-$container->instance(new Bar);
-$container->bind('foo', function()
-{
-	return new Foo();
-});
-
-print_r($container->make('foo')->getBar());
+print_r($container->make('foo'));
 
